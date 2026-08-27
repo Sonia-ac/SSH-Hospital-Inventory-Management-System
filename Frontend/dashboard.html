@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Inventory Dashboard</title>
+
+    <link rel="stylesheet" href="Styles/dashboard.css">
+</head>
+
+<body>
+
+
+<div class="dashboard">
+
+    <!-- ======================================
+         SIDEBAR
+    ======================================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                SSH
+            </div>
+
+            <div>
+                <h2>Inventory</h2>
+
+                <span>
+                    Management System
+                </span>
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <button
+                class="nav-link active"
+                data-section="overview"
+            >
+                <span>▣</span>
+                Dashboard
+            </button>
+
+
+            <button
+                class="nav-link"
+                data-section="add-stock"
+            >
+                <span>＋</span>
+                Add New Stock
+            </button>
+
+
+            <button
+                class="nav-link"
+                data-section="record-usage"
+            >
+                <span>↗</span>
+                Add New Record
+            </button>
+
+
+            <button
+                class="nav-link"
+                data-section="view-records"
+            >
+                <span>☷</span>
+                View Records
+            </button>
+
+
+            <button
+                class="nav-link"
+                data-section="statistics"
+            >
+                <span>◔</span>
+                View Statistics
+            </button>
+
+
+            <button
+                class="nav-link"
+                data-section="notifications"
+            >
+                <span>🔔</span>
+                Notifications
+                <span
+                    id="notificationBadge"
+                    class="notification-badge"
+                >
+                    0
+                </span>
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="user-mini">
+
+                <div class="avatar">
+                    A
+                </div>
+
+                <div>
+
+                    <strong id="sidebarUser">
+                        Admin
+                    </strong>
+
+                    <small>
+                        Administrator
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="logoutBtn"
+                class="logout-btn"
+            >
+                ⇥ Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ======================================
+         MAIN CONTENT
+    ======================================= -->
+
+    <main class="main-content">
+
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <button
+                    id="mobileMenuBtn"
+                    class="mobile-menu"
+                >
+                    ☰
+                </button>
+
+                <h1 id="pageTitle">
+                    Dashboard
+                </h1>
+
+                <p id="pageSubtitle">
+                    Here's what's happening with your inventory today.
+                </p>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <div class="date-display">
+                    <span>Today</span>
+
+                    <strong id="currentDate">
+                        --
+                    </strong>
+                </div>
+
+                <div class="user-avatar">
+                    A
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ======================================
+             OVERVIEW
+        ======================================= -->
+
+        <section
+            id="overview"
+            class="page-section active-section"
+        >
+
+
+            <div class="quick-actions">
+
+                <button
+                    class="quick-btn"
+                    data-go="add-stock"
+                >
+                    <span>＋</span>
+                    Add Stock
+                </button>
+
+                <button
+                    class="quick-btn secondary"
+                    data-go="record-usage"
+                >
+                    <span>↗</span>
+                    Record Usage
+                </button>
+
+            </div>
+
+
+            <!-- STAT CARDS -->
+
+            <div class="summary-cards">
+
+
+                <div class="summary-card">
+
+                    <div class="card-icon blue">
+                        📦
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Total Products
+                        </span>
+
+                        <strong id="totalProducts">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="card-icon green">
+                        📊
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Total Stock
+                        </span>
+
+                        <strong id="totalStock">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="card-icon orange">
+                        ⚠
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Low Stock
+                        </span>
+
+                        <strong id="lowStock">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="card-icon red">
+                        🚨
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Out of Stock
+                        </span>
+
+                        <strong id="outOfStock">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT RECORDS -->
+
+            <div class="dashboard-grid">
+
+
+                <div class="panel large-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h2>
+                                Recent Activity
+                            </h2>
+
+                            <p>
+                                Latest stock movements
+                            </p>
+
+                        </div>
+
+                        <button
+                            class="text-btn"
+                            data-go="view-records"
+                        >
+                            View all →
+                        </button>
+
+                    </div>
+
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Item</th>
+                                    <th>Type</th>
+                                    <th>Quantity</th>
+                                    <th>User</th>
+                                    <th>Date</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody
+                                id="recentRecordsTable"
+                            ></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LOW STOCK -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h2>
+                                Low Stock
+                            </h2>
+
+                            <p>
+                                Items needing attention
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="lowStockList"
+                        class="alert-list"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             ADD STOCK
+        ======================================= -->
+
+        <section
+            id="add-stock"
+            class="page-section"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    Add New Stock
+                </h2>
+
+                <p>
+                    Add new medicines or increase existing stock.
+                </p>
+
+            </div>
+
+
+            <div class="form-card">
+
+                <form id="stockForm">
+
+
+                    <div class="form-grid">
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Category
+                            </label>
+
+                            <select
+                                id="category"
+                                required
+                            >
+
+                                <option value="">
+                                    Select category
+                                </option>
+
+                                <option>
+                                    Tablet
+                                </option>
+
+                                <option>
+                                    Injection
+                                </option>
+
+                                <option>
+                                    Syrup
+                                </option>
+
+                                <option>
+                                    Drip
+                                </option>
+
+                                <option>
+                                    Equipment
+                                </option>
+
+                                <option>
+                                    Others
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Medicine / Item Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="medicineName"
+                                placeholder="e.g. Paracetamol"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Unit
+                            </label>
+
+                            <select
+                                id="stockUnit"
+                                required
+                            >
+
+                                <option value="">
+                                    Select unit
+                                </option>
+
+                                <option>
+                                    Pack/Card
+                                </option>
+
+                                <option>
+                                    Ampoules
+                                </option>
+
+                                <option>
+                                    Bottle
+                                </option>
+
+                                <option>
+                                    Vial
+                                </option>
+
+                                <option>
+                                    Box
+                                </option>
+
+                                <option>
+                                    Others
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Quantity Added
+                            </label>
+
+                            <input
+                                type="number"
+                                id="quantity"
+                                min="1"
+                                placeholder="Enter quantity"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Expiry Date
+                            </label>
+
+                            <input
+                                type="date"
+                                id="expiryDate"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Supplier
+                            </label>
+
+                            <input
+                                type="text"
+                                id="supplier"
+                                placeholder="Supplier / Pharmacy"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="reset"
+                            class="btn-light"
+                        >
+                            Clear
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn-primary"
+                        >
+                            Add Stock
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             RECORD USAGE
+        ======================================= -->
+
+        <section
+            id="record-usage"
+            class="page-section"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    Record Stock Usage
+                </h2>
+
+                <p>
+                    Record medicines or supplies issued to patients.
+                </p>
+
+            </div>
+
+
+            <div class="form-card">
+
+                <form id="usageForm">
+
+
+                    <div class="form-grid">
+
+
+                        <div class="form-group full">
+
+                            <label>
+                                Medicine / Item
+                            </label>
+
+                            <select
+                                id="medicine"
+                                required
+                            >
+
+                                <option value="">
+                                    Loading medicines...
+                                </option>
+
+                            </select>
+
+                            <small
+                                id="availableStock"
+                                class="stock-hint"
+                            >
+                                Select an item to see available stock.
+                            </small>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Quantity
+                            </label>
+
+                            <input
+                                type="number"
+                                id="usageQuantity"
+                                min="1"
+                                placeholder="Amount taken"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Patient Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="patientName"
+                                placeholder="e.g. Mr Caleb"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group full">
+
+                            <label>
+                                Description
+                            </label>
+
+                            <textarea
+                                id="description"
+                                placeholder="e.g. Taken for patient treatment"
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="reset"
+                            class="btn-light"
+                        >
+                            Clear
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn-danger"
+                        >
+                            Record Usage
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             VIEW RECORDS
+        ======================================= -->
+
+        <section
+            id="view-records"
+            class="page-section"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    All Records
+                </h2>
+
+                <p>
+                    Search, filter and manage inventory activity.
+                </p>
+
+            </div>
+
+
+            <div class="record-filters">
+
+
+                <div class="search-box">
+
+                    <span>⌕</span>
+
+                    <input
+                        type="text"
+                        id="recordSearch"
+                        placeholder="Search medicine, user or description..."
+                    >
+
+                </div>
+
+
+                <select id="typeFilter">
+
+                    <option value="">
+                        All Types
+                    </option>
+
+                    <option value="stock In">
+                        Stock In
+                    </option>
+
+                    <option value="stock Out">
+                        Stock Out
+                    </option>
+
+                </select>
+
+
+                <select id="categoryFilter">
+
+                    <option value="">
+                        All Categories
+                    </option>
+
+                </select>
+
+
+                <input
+                    type="date"
+                    id="dateFilter"
+                >
+
+
+                <select id="sortFilter">
+
+                    <option value="newest">
+                        Newest First
+                    </option>
+
+                    <option value="oldest">
+                        Oldest First
+                    </option>
+
+                    <option value="quantityHigh">
+                        Quantity: High
+                    </option>
+
+                    <option value="quantityLow">
+                        Quantity: Low
+                    </option>
+
+                </select>
+
+
+                <button
+                    id="clearFilters"
+                    class="btn-light"
+                >
+                    Clear Filters
+                </button>
+
+            </div>
+
+
+            <div class="record-summary">
+
+                <span>
+                    Showing
+                    <strong id="recordCount">
+                        0
+                    </strong>
+                    records
+                </span>
+
+            </div>
+
+
+            <div class="panel table-panel">
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Unit</th>
+                                <th>Quantity</th>
+                                <th>User</th>
+                                <th>Patient</th>
+                                <th>Description</th>
+                                <th>Date</th>
+                                <th>Time</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody
+                            id="recordsTable"
+                        ></tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div class="pagination">
+
+                    <button
+                        id="prevPage"
+                    >
+                        ← Previous
+                    </button>
+
+                    <span id="pageInfo">
+                        Page 1
+                    </span>
+
+                    <button
+                        id="nextPage"
+                    >
+                        Next →
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             STATISTICS
+        ======================================= -->
+
+        <section
+            id="statistics"
+            class="page-section"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    Statistics
+                </h2>
+
+                <p>
+                    Overview of your inventory status.
+                </p>
+
+            </div>
+
+
+            <div class="statistics-grid">
+
+                <div class="stat-box">
+
+                    <span>
+                        Total Products
+                    </span>
+
+                    <strong id="statProducts">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="stat-box">
+
+                    <span>
+                        Total Stock
+                    </span>
+
+                    <strong id="statStock">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="stat-box">
+                    <span>  Low Stock Items </span>
+                    <strong id="statLowStock">   0  </strong>
+                </div>
+
+                <div class="stat-box">
+                    <span>   Expiring Soon </span>
+                    <strong id="statExpiring">  0 </strong>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- NOTIFICATIONS -->
+        <section id="notifications" class="page-section" >
+            <div class="section-heading"> <h2> Notifications </h2>
+                <p>  Important inventory alerts. </p>
+            </div>
+            <div id="notificationList" class="notifications-container" ></div>
+        </section>
+
+    </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast" ></div>
+
+<script src="./Js/app.js"></script>
+<script type="module" src="./Js/dashboard.js"></script>
+<script type="module" src="./Js/records.js"></script>
+
+</body>
+</html>

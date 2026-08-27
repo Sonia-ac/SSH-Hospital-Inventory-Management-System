@@ -1,0 +1,20 @@
+# DEPENDENCIES
+node_modules/
+**/node_modules/
+
+# ENVIRONMENT VARIABLES / SECRETS
+.env
+.env.*
+**/.env
+**/.env.*
+
+# LOG FILES
+*.log
+npm-debug.log*
+
+# OS FILES
+.DS_Store
+Thumbs.db
+
+# EDITOR FILES
+.vscode/

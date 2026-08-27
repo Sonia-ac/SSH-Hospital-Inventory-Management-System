@@ -1,0 +1,18 @@
+# Ignore environment variables file  NEVER upload these
+.env
+.env.*
+
+# Dependencies
+node_modules/
+
+
+# Logs
+*.log
+npm-debug.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# VS Code settings
+.vscode/
