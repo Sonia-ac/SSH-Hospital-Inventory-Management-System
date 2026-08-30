@@ -1,5 +1,5 @@
 import express from "express";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import pool from "../config/db.js";
 
@@ -65,9 +65,7 @@ router.post("/login", async (req, res) => {
         );
 
         res.json({
-
             message: "Login successful.",
-
             token,
 
             user: {
@@ -89,6 +87,66 @@ router.post("/login", async (req, res) => {
 
     }
 
+});
+
+// REGISTER
+router.post("/register", async (req, res) => {
+    try {
+
+        const {
+            name,
+            username,
+            password
+        } = req.body;
+
+        if (!name || !username || !password) {
+            return res.status(400).json({
+                message: "All fields are required."
+            });
+        }
+
+        const [existingUsers] =
+            await pool.execute(
+                `SELECT id FROM users WHERE username = ?`,
+                [username]
+            );
+
+        if (existingUsers.length > 0) {
+            return res.status(409).json({
+                message: "Username already exists."
+            });
+        }
+
+        const hashedPassword =
+            await bcrypt.hash(password, 10);
+
+        await pool.execute(
+            `
+            INSERT INTO users
+            (name, username, password, role)
+            VALUES (?, ?, ?, ?)
+            `,
+            [
+                name,
+                username,
+                hashedPassword,
+                "staff"
+            ]
+        );
+
+        res.status(201).json({
+            message: "Registration successful. You can now login."
+        });
+
+    } catch (error) {
+
+        console.error("REGISTER ERROR:", error);
+
+        res.status(500).json({
+            message: "Registration failed."
+        });
+
+    }
 });
 
 export default router;

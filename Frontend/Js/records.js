@@ -104,7 +104,6 @@ function populateCategoryFilter() {
 
 }
 
-
 // ==========================================
 // APPLY ALL FILTERS
 // ==========================================
@@ -191,18 +190,7 @@ function applyFilters() {
             }
 
 
-            return (
-
-                matchesSearch &&
-
-                matchesType &&
-
-                matchesCategory &&
-
-                matchesDate
-
-            );
-
+            return ( matchesSearch &&  matchesType && matchesCategory && matchesDate);
         });
 
 
@@ -308,101 +296,40 @@ function renderRecords() {
     if (!pageRecords.length) {
 
         tableBody.innerHTML = `
-
             <tr>
-
-                <td
-                    colspan="10"
-                    style="text-align:center;padding:30px"
-                >
-
+                <td colspan="11" style="text-align:center;padding:30px" >
                     No records found.
-
                 </td>
-
             </tr>
-
         `;
 
     } else {
 
         pageRecords.forEach(
-            record => {
+            record => { const row =  document.createElement("tr");
 
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
+                //Calculate displayed amount
+              const transactionAmount =
+                 record.type === "stock In"
+                     ? record.total_cost
+                     : record.total_amount;
 
 
                 row.innerHTML = `
 
-                    <td>
-                        <strong>
-                            ${escapeHTML(
-                                record.name
-                            )}
-                        </strong>
+                    <td> <strong> ${escapeHTML(record.name)} </strong> </td>
+                    <td> ${escapeHTML(record.category)}</td>
+                    <td class="${ record.type === "stock In"  ? "type-in" : "type-out"}">
+                        ${ record.type === "stock In" ? "Stock In"  : "Stock Out" }
                     </td>
-
-                    <td>
-                        ${escapeHTML(
-                            record.category
-                        )}
-                    </td>
-
-                    <td class="${
-                        record.type === "stock In"
-                            ? "type-in"
-                            : "type-out"
-                    }">
-
-                        ${
-                            record.type === "stock In"
-                                ? "Stock In"
-                                : "Stock Out"
-                        }
-
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            record.unit
-                        )}
-                    </td>
-
-                    <td>
-                        ${record.quantity}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            record.user
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            record.patient_name || "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            record.description || "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${formatDate(
-                            record.date
-                        )}
-                    </td>
-
-                    <td>
-                        ${record.time || "-"}
-                    </td>
-
+                    <td> ${escapeHTML(record.unit)} </td>
+                    <td> ${record.quantity} </td>
+                    <td> ${formatCurrency( transactionAmount )} </td>
+                    <td> ${escapeHTML( record.user )} </td>
+                    <td> ${escapeHTML( record.patient_name || "-" )} </td>
+                    <td> ${escapeHTML( record.description || "-" )} </td>
+                    <td> ${formatDate(  record.date )} </td>
+                    <td> ${record.time || "-"} </td>
                 `;
 
 

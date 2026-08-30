@@ -1,6 +1,6 @@
 import express from "express";
 import pool from "../config/db.js";
-import { authenticateToken } from "../middleware/auth.js";
+import { authenticateToken, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ const router = express.Router();
 // DASHBOARD STATISTICS
 // ==========================================
 
-router.get("/stats", authenticateToken, async (req, res) => {
+router.get("/stats", authenticateToken, requireAdmin, async (req, res) => {
 
     try {
 

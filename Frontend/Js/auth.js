@@ -52,3 +52,13 @@ if (loginForm) {
         }
     });
 }
+
+localStorage.setItem(
+    "inventoryToken",
+    data.token
+);
+
+localStorage.setItem(
+    "inventoryUser",
+    JSON.stringify(data.user)
+);

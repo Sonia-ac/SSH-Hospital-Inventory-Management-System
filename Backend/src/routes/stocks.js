@@ -1,6 +1,6 @@
 import express from "express";
 import pool from "../config/db.js";
-import { authenticateToken } from "../middleware/auth.js";
+import { authenticateToken, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ const router = express.Router();
 // GET ALL RECORDS
 // ==========================================
 
-router.get("/", authenticateToken, async (req, res) => {
+router.get("/", authenticateToken, requireAdmin, async (req, res) => {
 
     try {
 
@@ -22,6 +22,10 @@ router.get("/", authenticateToken, async (req, res) => {
                 type,
                 unit,
                 quantity,
+                unit_cost,
+                unit_price,
+                total_cost,
+                total_amount,
                 user,
                 patient_name,
                 description,
@@ -81,8 +85,7 @@ router.get("/medicines", authenticateToken, async (req, res) => {
 // ADD NEW STOCK
 // ==========================================
 
-router.post("/stock-in", authenticateToken, async (req, res) => {
-
+router.post("/stock-in", authenticateToken, requireAdmin, async (req, res) => {
     const connection = await pool.getConnection();
 
     try {
@@ -92,15 +95,21 @@ router.post("/stock-in", authenticateToken, async (req, res) => {
             category,
             unit,
             quantity,
+            totalCost,
             expiryDate,
             supplier
         } = req.body;
+
+        const qty = Number(quantity);
+        const purchaseCost = Number(totalCost);
+
 
         if (
             !name ||
             !category ||
             !unit ||
-            !quantity
+            !qty ||
+            !purchaseCost
         ) {
 
             return res.status(400).json({
@@ -109,26 +118,51 @@ router.post("/stock-in", authenticateToken, async (req, res) => {
 
         }
 
-        if (Number(quantity) <= 0) {
+        if (qty <= 0 || purchaseCost <= 0) {
 
             return res.status(400).json({
-                message: "Quantity must be greater than zero."
+                message: "Quantity and purchase cost must be greater than zero."
             });
 
         }
 
+         // Cost of ONE unit in this new delivery
+        const incomingUnitCost = purchaseCost / qty;
+
         await connection.beginTransaction();
 
-        const [existing] = await connection.execute(
-            "SELECT * FROM medicines WHERE name = ?",
+
+        const [existingItems] = await connection.execute(
+            `SELECT * FROM medicines WHERE name = ? FOR UPDATE`,
             [name]
         );
 
         let medicineId;
+        let finalUnitCost;
+        let finalSellingPrice;
 
-        if (existing.length > 0) {
+        //Existing medicine found, update quantity and possibly cost
+        if (existingItems.length > 0) {
 
-            medicineId = existing[0].id;
+            const existing = existingItems[0];
+            const oldQuantity =Number(existing.quantity);
+            const oldUnitCost = Number(existing.cost_per_unit);
+            /*
+                Weighted Average= Existing inventory value + New inventory value
+                    divided by
+                Total quantity
+            */
+
+            const existingValue = oldQuantity * oldUnitCost;
+            const newValue =qty * incomingUnitCost;
+            const newTotalQuantity = oldQuantity + qty;
+
+            finalUnitCost = (existingValue + newValue) / newTotalQuantity;
+            finalSellingPrice = finalUnitCost * 6;
+
+
+
+            medicineId = existing.id;
 
             await connection.execute(
                 `
@@ -137,6 +171,9 @@ router.post("/stock-in", authenticateToken, async (req, res) => {
                     category = ?,
                     unit = ?,
                     quantity = quantity + ?,
+                    cost_per_unit = ?,
+                    markup_percentage = 500,
+                    selling_price = ?,
                     supplier = ?,
                     expiry_date = ?
                 WHERE id = ?
@@ -145,6 +182,8 @@ router.post("/stock-in", authenticateToken, async (req, res) => {
                     category,
                     unit,
                     quantity,
+                    finalUnitCost.toFixed(2),
+                    finalSellingPrice.toFixed(2),
                     supplier || null,
                     expiryDate || null,
                     medicineId
@@ -152,18 +191,23 @@ router.post("/stock-in", authenticateToken, async (req, res) => {
             );
 
         } else {
+            finalUnitCost =  incomingUnitCost;
+            finalSellingPrice = incomingUnitCost * 6;
 
             const [result] = await connection.execute(
                 `
                 INSERT INTO medicines
-                (name, category, unit, quantity, supplier, expiry_date)
-                VALUES (?, ?, ?, ?, ?, ?)
+                (name, category, unit, quantity, cost_per_unit, markup_percentage, selling_price, supplier, expiry_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 `,
                 [
                     name,
                     category,
                     unit,
-                    quantity,
+                    qty,
+                    finalUnitCost.toFixed(2),
+                    500,
+                    finalSellingPrice.toFixed(2),
                     supplier || null,
                     expiryDate || null
                 ]
@@ -174,9 +218,7 @@ router.post("/stock-in", authenticateToken, async (req, res) => {
         }
 
         const now = new Date();
-
         const date = now.toISOString().split("T")[0];
-
         const time = now.toTimeString().split(" ")[0];
 
         await connection.execute(
@@ -189,6 +231,10 @@ router.post("/stock-in", authenticateToken, async (req, res) => {
                 type,
                 unit,
                 quantity,
+                unit_cost,
+                unit_price,
+                total_cost,
+                total_amount,
                 user,
                 supplier,
                 expiry_date,
@@ -196,14 +242,18 @@ router.post("/stock-in", authenticateToken, async (req, res) => {
                 date,
                 time
             )
-            VALUES (?, ?, ?, 'stock In', ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, 'stock In', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `,
             [
                 medicineId,
                 name,
                 category,
                 unit,
-                quantity,
+                qty,
+                incomingUnitCost.toFixed(2),
+                finalSellingPrice.toFixed(2),
+                purchaseCost.toFixed(2),
+                null,
                 req.user.name,
                 supplier || null,
                 expiryDate || null,
@@ -216,10 +266,18 @@ router.post("/stock-in", authenticateToken, async (req, res) => {
         await connection.commit();
 
         res.status(201).json({
-            message: "Stock added successfully."
-        });
+            message: "Stock added successfully.",
 
-    } catch (error) {
+             pricing: { quantityAdded:  qty,
+                        totalPurchaseCost: purchaseCost,
+                        incomingUnitCost: Number( incomingUnitCost.toFixed(2)),
+                        averageUnitCost: Number( finalUnitCost.toFixed(2)),
+                        markupPercentage: 500,
+                        sellingPricePerUnit:  Number( finalSellingPrice.toFixed(2))
+                      }
+        });
+  }
+catch (error) {
 
         await connection.rollback();
 
@@ -255,7 +313,10 @@ router.post("/stock-out", authenticateToken, async (req, res) => {
             description
         } = req.body;
 
-        if (!medicineId || !quantity) {
+        const qty = Number(quantity);
+
+
+        if (!medicineId || !qty) {
 
             return res.status(400).json({
                 message: "Medicine and quantity are required."
@@ -263,7 +324,7 @@ router.post("/stock-out", authenticateToken, async (req, res) => {
 
         }
 
-        if (Number(quantity) <= 0) {
+        if (qty <= 0) {
 
             return res.status(400).json({
                 message: "Quantity must be greater than zero."
@@ -273,49 +334,56 @@ router.post("/stock-out", authenticateToken, async (req, res) => {
 
         await connection.beginTransaction();
 
-        const [medicines] = await connection.execute(
+        const [items] = await connection.execute(
             "SELECT * FROM medicines WHERE id = ? FOR UPDATE",
             [medicineId]
         );
 
-        if (medicines.length === 0) {
+        if (items.length === 0) {
 
             await connection.rollback();
 
             return res.status(404).json({
-                message: "Medicine not found."
+                message: "Item not found."
             });
 
         }
 
-        const medicine = medicines[0];
+        const medicine = items[0];
+        const availableStock = Number(medicine.quantity);
 
-        if (medicine.quantity < Number(quantity)) {
+        if (availableStock < qty) {
 
             await connection.rollback();
 
             return res.status(400).json({
-                message: `Insufficient stock. Available quantity: ${medicine.quantity}`
+                message: `Insufficient stock. Only ${availableStock} ${medicine.unit}(s) available.`
             });
 
         }
 
+         const unitCost = Number(  medicine.cost_per_unit);
+        const unitPrice = Number(   medicine.selling_price);
+
+        // MAIN STOCK-OUT CALCULATION
+        const totalAmount = unitPrice * qty;
+        const remainingQuantity =  availableStock - qty;
+
+
         await connection.execute(
             `
             UPDATE medicines
-            SET quantity = quantity - ?
+            SET quantity = ?
             WHERE id = ?
             `,
             [
-                quantity,
+                remainingQuantity,
                 medicineId
             ]
         );
 
         const now = new Date();
-
         const date = now.toISOString().split("T")[0];
-
         const time = now.toTimeString().split(" ")[0];
 
         await connection.execute(
@@ -328,6 +396,10 @@ router.post("/stock-out", authenticateToken, async (req, res) => {
                 type,
                 unit,
                 quantity,
+                unit_cost,
+                unit_price,
+                total_cost,
+                total_amount,
                 user,
                 patient_name,
                 description,
@@ -336,14 +408,18 @@ router.post("/stock-out", authenticateToken, async (req, res) => {
                 date,
                 time
             )
-            VALUES (?, ?, ?, 'stock Out', ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, 'stock Out', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `,
             [
                 medicine.id,
                 medicine.name,
                 medicine.category,
                 medicine.unit,
-                quantity,
+                qty,
+                unitCost.toFixed(2),
+                unitPrice.toFixed(2),
+                null,
+                totalAmount.toFixed(2),
                 req.user.name,
                 patientName || null,
                 description || null,
@@ -357,13 +433,22 @@ router.post("/stock-out", authenticateToken, async (req, res) => {
         await connection.commit();
 
         res.status(201).json({
-            message: "Usage recorded successfully."
+            message: "Usage recorded successfully.",
+            pricing: {item: medicine.name,
+                      quantity: qty,
+                      unit: medicine.unit,
+                      costPerUnit: unitCost,
+                      sellingPricePerUnit: unitPrice,
+                      markup:500,
+                      totalAmount:  Number( totalAmount.toFixed(2)),
+                      remainingStock: remainingQuantity 
+                     }
+
         });
 
+
     } catch (error) {
-
         await connection.rollback();
-
         console.error(error);
 
         res.status(500).json({

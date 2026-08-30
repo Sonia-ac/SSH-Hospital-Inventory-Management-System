@@ -1,0 +1,219 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        linear-gradient(
+            rgba(9, 35, 65, 0.55),
+            rgba(9, 35, 65, 0.55)
+        ),
+        url("../images/background.jpg");
+
+    background-size: cover;
+    background-position: center;
+}
+
+
+/* =========================
+   REGISTER CONTAINER
+========================= */
+
+.login-container {
+    width: 100%;
+    padding: 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* =========================
+   REGISTER CARD
+========================= */
+
+.login-card {
+    width: 100%;
+    max-width: 470px;
+
+    background: white;
+
+    padding: 42px 45px;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 15px 45px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================
+   HEADING
+========================= */
+
+.login-card h1 {
+    text-align: center;
+
+    color: #0b2344;
+
+    font-size: 32px;
+    line-height: 1.15;
+
+    margin-bottom: 8px;
+}
+
+.login-card > p {
+    text-align: center;
+
+    color: #667085;
+
+    margin-bottom: 30px;
+
+    font-size: 15px;
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+#registerForm {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#registerForm label {
+    color: #344054;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    margin-top: 8px;
+}
+
+#registerForm input {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #d0d5dd;
+    border-radius: 9px;
+
+    font-size: 15px;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+#registerForm input:focus {
+    border-color: #123c69;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(18, 60, 105, 0.10);
+}
+
+
+/* =========================
+   REGISTER BUTTON
+========================= */
+
+#registerForm button {
+    width: 100%;
+
+    margin-top: 20px;
+
+    padding: 13px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #123c69;
+
+    color: white;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+#registerForm button:hover {
+    background: #0b2d50;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+#registerMessage {
+    text-align: center;
+
+    font-size: 14px;
+
+    margin-top: 8px;
+
+    min-height: 18px;
+}
+
+
+/* =========================
+   LOGIN LINK
+========================= */
+
+#registerForm p:last-child {
+    text-align: center;
+
+    margin-top: 8px;
+
+    color: #667085;
+
+    font-size: 14px;
+}
+
+#registerForm a {
+    color: #123c69;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+#registerForm a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 550px) {
+
+    .login-card {
+        padding: 32px 24px;
+    }
+
+    .login-card h1 {
+        font-size: 27px;
+    }
+
+}

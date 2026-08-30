@@ -1,5 +1,66 @@
 export const API = "http://localhost:5000/api";
 
+// USER ROLE / ACCESS CONTROL
+const loggedInUser = JSON.parse(
+    localStorage.getItem("inventoryUser")
+);
+
+if (!loggedInUser) {
+    window.location.href = "login.html";
+}
+
+const isAdmin =
+    loggedInUser?.role === "admin";
+
+//Display User Role
+const sidebarRole =
+    document.getElementById("sidebarRole");
+
+if (sidebarRole) {
+    sidebarRole.textContent = isAdmin
+            ? "Administrator"
+            : "Staff";
+
+}
+// Hide admin-only elements for staff
+if (!isAdmin) {
+    document
+        .querySelectorAll(".admin-only")
+        .forEach(element => {
+            element.style.display = "none";
+        });
+
+}
+
+if (loggedInUser.role !== "admin") {
+
+    document
+        .querySelectorAll(".admin-only")
+        .forEach(element => {
+            element.style.display = "none";
+        });
+
+    document
+        .querySelectorAll(".page-section")
+        .forEach(section => {
+            section.classList.remove(
+                "active-section"
+            );
+        });
+
+    const usageSection =
+        document.getElementById(
+            "record-usage"
+        );
+
+    if (usageSection) {
+        usageSection.classList.add(
+            "active-section"
+        );
+    }
+
+}
+
 // AUTH HEADERS
 function authHeaders() {
     return { "Content-Type": "application/json",
@@ -259,11 +320,12 @@ async function loadMedicines() {
                 document.createElement(  "option"  );
 
             option.value =  medicine.id;
-
-            option.textContent =
-                `${medicine.name} (${medicine.quantity} available)`;
-
+            option.textContent = `${medicine.name} - ${medicine.quantity} ${medicine.unit}(s) available)`;
             option.dataset.quantity =  medicine.quantity;
+            option.dataset.unit =  medicine.unit;
+            option.dataset.cost = medicine.cost_per_unit;
+            option.dataset.price = medicine.selling_price;
+
 
             select.appendChild(option);
 
@@ -300,6 +362,49 @@ if (medicineSelect) {
     );
 }
 
+// ==========================================
+// STOCK-IN PRICE PREVIEW
+// ==========================================
+
+const stockQuantityInput = document.getElementById(  "quantity");
+const totalCostInput = document.getElementById(   "totalCost");
+
+function updateStockPricePreview() {
+    const quantity =  Number( stockQuantityInput?.value ) || 0;
+    const totalCost = Number(  totalCostInput?.value) || 0;
+
+    let unitCost = 0;
+    let sellingPrice = 0;
+
+    if ( quantity > 0 && totalCost > 0 ) {
+        unitCost = totalCost / quantity;
+        sellingPrice = unitCost * 6;
+    }
+
+    document.getElementById( "previewQuantity"  ).textContent =  quantity;
+    document.getElementById( "previewTotalCost").textContent = formatCurrency(totalCost);
+    document.getElementById( "previewUnitCost" ).textContent = formatCurrency(unitCost);
+    document.getElementById( "previewSellingPrice" ).textContent =  formatCurrency(sellingPrice );
+
+}
+
+   stockQuantityInput?.addEventListener("input", updateStockPricePreview);
+   totalCostInput?.addEventListener("input", updateStockPricePreview);
+ 
+   function formatCurrency(amount) {
+
+    return new Intl.NumberFormat(
+        "en-NG",
+        {
+            style: "currency",
+            currency: "NGN",
+            minimumFractionDigits: 2
+        }
+    ).format( Number(amount) || 0);
+}
+
+window.formatCurrency =
+    formatCurrency;
 
 // ADD STOCK
 const stockForm =
@@ -313,20 +418,13 @@ if (stockForm) {
             event.preventDefault();
 
             const data = {
-                name:
-                    document.getElementById( "medicineName"  ).value.trim(),
-                category:
-                    document.getElementById(  "category" ).value,
-                unit:
-                    document.getElementById( "stockUnit"  ).value,
-                quantity:
-                    Number(
-                        document.getElementById( "quantity" ).value
-                    ),
-                expiryDate:
-                    document.getElementById( "expiryDate"  ).value,
-                supplier:
-                    document.getElementById(  "supplier"  ).value.trim()
+                name: document.getElementById( "medicineName"  ).value.trim(),
+                category: document.getElementById(  "category" ).value,
+                unit: document.getElementById( "stockUnit"  ).value,
+                quantity: Number( document.getElementById( "quantity" ).value),
+                totalCost: Number( document.getElementById( "totalCost"  ).value ),
+                expiryDate: document.getElementById( "expiryDate"  ).value,
+                supplier: document.getElementById(  "supplier"  ).value.trim()
             };
 
 
@@ -469,9 +567,9 @@ if (usageForm) { usageForm.addEventListener( "submit",
 
 
                 await refreshDashboard();
-
-
+                if (isAdmin) {
                 showSection("overview");
+                } else {showSection("record-usage");}
 
 
             } catch (error) {
@@ -480,13 +578,132 @@ if (usageForm) { usageForm.addEventListener( "submit",
                     error.message,
                     "error"
                 );
-
             }
-
         }
     );
+}
+
+
+const usageMedicine =
+    document.getElementById(
+        "medicine"
+    );
+
+
+const usageQuantity =
+    document.getElementById(
+        "usageQuantity"
+    );
+
+
+function updateUsagePrice() {
+
+    const option =
+        usageMedicine
+            ?.selectedOptions[0];
+
+
+    if (
+        !option ||
+        !option.value
+    ) {
+
+        document.getElementById(
+            "usageAvailable"
+        ).textContent = "-";
+
+
+        document.getElementById(
+            "usageUnitCost"
+        ).textContent =
+            formatCurrency(0);
+
+
+        document.getElementById(
+            "usageSellingPrice"
+        ).textContent =
+            formatCurrency(0);
+
+
+        document.getElementById(
+            "usageTotalAmount"
+        ).textContent =
+            formatCurrency(0);
+
+
+        return;
+
+    }
+
+
+    const available =
+        Number(
+            option.dataset.quantity
+        );
+
+
+    const unit =
+        option.dataset.unit || "";
+
+
+    const cost =
+        Number(
+            option.dataset.cost
+        );
+
+
+    const price =
+        Number(
+            option.dataset.price
+        );
+
+
+    const quantity =
+        Number(
+            usageQuantity?.value
+        ) || 0;
+
+
+    const total =
+        price * quantity;
+
+
+    document.getElementById(
+        "usageAvailable"
+    ).textContent =
+        `${available} ${unit}(s)`;
+
+
+    document.getElementById(
+        "usageUnitCost"
+    ).textContent =
+        formatCurrency(cost);
+
+
+    document.getElementById(
+        "usageSellingPrice"
+    ).textContent =
+        formatCurrency(price);
+
+
+    document.getElementById(
+        "usageTotalAmount"
+    ).textContent =
+        formatCurrency(total);
 
 }
+
+
+usageMedicine?.addEventListener(
+    "change",
+    updateUsagePrice
+);
+
+
+usageQuantity?.addEventListener(
+    "input",
+    updateUsagePrice
+);
 
 
 // ==========================================
@@ -494,31 +711,27 @@ if (usageForm) { usageForm.addEventListener( "submit",
 // ==========================================
 
 async function refreshDashboard() {
-
+    //for all
     await Promise.all([
-
-        loadDashboardStats(),
-
-        loadLowStock(),
-
-        loadRecentActivity(),
-
         loadNotifications(),
-
         loadMedicines()
+    ]);
 
+    //for only admins
+    if (isAdmin){
+    await Promise.all([
+        loadDashboardStats(),
+        loadLowStock(),
+        loadRecentActivity(),
+        loadNotifications(),
+        loadMedicines()
     ]);
 
 
-    if (
-        typeof loadRecords ===
-        "function"
-    ) {
-
+    if ( typeof loadRecords === "function" ) {
         loadRecords();
-
     }
-
+}
 }
 
 
@@ -527,24 +740,13 @@ async function refreshDashboard() {
 // ==========================================
 
 function formatDate(date) {
-
     if (!date) return "-";
 
+    const d = new Date(date);
 
-    const d =
-        new Date(date);
+    if (isNaN(d)) {  return date; }
 
-
-    if (isNaN(d)) {
-
-        return date;
-
-    }
-
-
-    return d.toLocaleDateString(
-        "en-NG"
-    );
+    return d.toLocaleDateString( "en-NG" );
 
 }
 
@@ -556,133 +758,17 @@ window.formatDate = formatDate;
 // START
 // ==========================================
 
-refreshDashboard();
-// // LOAD RECORDS FROM DATABASE
+async function startApp() {
 
-// async function loadRecords() {
-//     try {
-//         const response = await fetch("http://localhost:5000/api/stocks");
+    await refreshDashboard();
 
-//         if (!response.ok) { throw new Error("Failed to fetch records"); }
+    // Staff start directly on Record Usage
+    if (!isAdmin) {
 
-//         allRecords = await response.json();
+        showSection("record-usage");
 
-//         displayRecords(allRecords);
+    }
 
-//     } catch (error) {
+}
 
-//         console.error("Error loading records:", error);
-
-//     }
-// }
-
-// // DISPLAY RECORDS
-
-// function displayRecords(records) {
-//     const tableBody = document.getElementById("recordsTable");
-//     // Make sure the table exists on this page
-//     if (!tableBody) {
-//         return;
-//     }
-//     tableBody.innerHTML = "";
-
-//     records.forEach(record => {
-//         const row = document.createElement("tr");
-//         const date = record.date
-//             ? new Date(record.date).toLocaleDateString()
-//             : "-";
-
-//         row.innerHTML = `
-//             <td>${record.name || "-"}</td>
-//             <td>${record.category || "-"}</td>
-//             <td>${record.type || "-"}</td>
-//             <td>${record.unit || "-"}</td>
-//             <td>${record.quantity || "-"}</td>
-//             <td>${record.user || "-"}</td>
-//             <td>${record.description || "-"}</td>
-//             <td>${date}</td>
-//             <td>${record.time || "-"}</td>
-//         `;
-
-//         tableBody.appendChild(row);
-
-//     });
-// }
-// loadRecords();
-
-// // FILTER RECORDS
-// function filterRecords() {
-//     const searchInput = document.getElementById("recordsearch");
-//     const typeFilter = document.getElementById("typeFilter");
-//     const dateFilter = document.getElementById("dateFilter");
-
-//     const searchTerm = searchInput
-//         ? searchInput.value.toLowerCase().trim()
-//         : "";
-
-//     const selectedType = typeFilter
-//         ? typeFilter.value
-//         : "all";
-
-//     const selectedDate = dateFilter
-//         ? dateFilter.value
-//         : "";
-
-//     const filteredRecords = allRecords.filter(record => {
-
-//         // SEARCH FILTER
-//         const matchesSearch =
-//             (record.name || "")
-//                 .toLowerCase()
-//                 .includes(searchTerm);
-
-
-//         // TYPE FILTER
-//         const matchesType =
-//             selectedType === "all" ||
-//             (record.type || "").toLowerCase() === selectedType.toLowerCase();
-
-
-//         // DATE FILTER
-//         let matchesDate = true;
-//         if (selectedDate && record.date) {
-
-//             const recordDate = new Date(record.date)
-//                 .toISOString()
-//                 .split("T")[0];
-
-//             matchesDate = recordDate === selectedDate;
-
-//         }
-
-
-//         return matchesSearch && matchesType && matchesDate;
-
-//     });
-
-
-//     displayRecords(filteredRecords);
-
-// }
-
-// // SEARCH
-// const searchInput = document.getElementById("recordsearch");
-// if (searchInput) {
-//     searchInput.addEventListener("input", filterRecords);
-// }
-
-// // RECORD TYPE FILTER
-// const typeFilter = document.getElementById("typeFilter");
-// if (typeFilter) {
-//     typeFilter.addEventListener("change", filterRecords);
-// }
-
-// // DATE FILTER
-// const dateFilter = document.getElementById("dateFilter");
-// if (dateFilter) {
-//     dateFilter.addEventListener("change", filterRecords);
-// }
-
-
-// // START LOADING RECORDS
-// loadRecords();
+startApp();

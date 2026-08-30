@@ -13,111 +13,58 @@
 
 <div class="dashboard">
 
-    <!-- ======================================
-         SIDEBAR
-    ======================================= -->
-
+    <!-- SIDEBAR -->
     <aside class="sidebar">
-
         <div class="brand">
-
-            <div class="brand-icon">
-                SSH
-            </div>
-
+            <div class="brand-icon"> SSH </div>
             <div>
                 <h2>Inventory</h2>
-
-                <span>
-                    Management System
-                </span>
+                <span>  Management System </span>
             </div>
-
         </div>
 
 
         <nav>
-
-            <button
-                class="nav-link active"
-                data-section="overview"
-            >
+            <button class="nav-link active admin-only" data-section="overview">
                 <span>▣</span>
                 Dashboard
             </button>
 
-
-            <button
-                class="nav-link"
-                data-section="add-stock"
-            >
+            <button class="nav-link admin-only" data-section="add-stock">
                 <span>＋</span>
                 Add New Stock
             </button>
 
-
-            <button
-                class="nav-link"
-                data-section="record-usage"
-            >
+            <button class="nav-link" data-section="record-usage">
                 <span>↗</span>
                 Add New Record
             </button>
 
-
-            <button
-                class="nav-link"
-                data-section="view-records"
-            >
+            <button class="nav-link admin-only" data-section="view-records">
                 <span>☷</span>
                 View Records
             </button>
 
-
-            <button
-                class="nav-link"
-                data-section="statistics"
-            >
+            <button class="nav-link admin-only"  data-section="statistics" >
                 <span>◔</span>
                 View Statistics
             </button>
 
-
-            <button
-                class="nav-link"
-                data-section="notifications"
-            >
+            <button class="nav-link" data-section="notifications">
                 <span>🔔</span>
                 Notifications
-                <span
-                    id="notificationBadge"
-                    class="notification-badge"
-                >
-                    0
-                </span>
+                <span id="notificationBadge" class="notification-badge">  0 </span>
             </button>
 
         </nav>
 
 
         <div class="sidebar-bottom">
-
             <div class="user-mini">
-
-                <div class="avatar">
-                    A
-                </div>
-
+                <div class="avatar"> A </div>
                 <div>
-
-                    <strong id="sidebarUser">
-                        Admin
-                    </strong>
-
-                    <small>
-                        Administrator
-                    </small>
-
+                    <strong id="sidebarUser">  Admin  </strong>
+                    <small id="sidebarRole">   Administrator </small>
                 </div>
 
             </div>
@@ -189,30 +136,17 @@
              OVERVIEW
         ======================================= -->
 
-        <section
-            id="overview"
-            class="page-section active-section"
-        >
-
-
+        <section id="overview" class="page-section active-section admin-only" >
             <div class="quick-actions">
-
-                <button
-                    class="quick-btn"
-                    data-go="add-stock"
-                >
+                <button class="quick-btn" data-go="add-stock">
                     <span>＋</span>
                     Add Stock
                 </button>
 
-                <button
-                    class="quick-btn secondary"
-                    data-go="record-usage"
-                >
+                <button class="quick-btn secondary" data-go="record-usage">
                     <span>↗</span>
                     Record Usage
                 </button>
-
             </div>
 
 
@@ -404,21 +338,11 @@
              ADD STOCK
         ======================================= -->
 
-        <section
-            id="add-stock"
-            class="page-section"
-        >
+        <section  id="add-stock" class="page-section admin-only">
 
             <div class="section-heading">
-
-                <h2>
-                    Add New Stock
-                </h2>
-
-                <p>
-                    Add new medicines or increase existing stock.
-                </p>
-
+                <!-- <h2>  Add New Stock  </h2>
+                <p>  Add new medicines or increase existing stock. </p> -->
             </div>
 
 
@@ -426,181 +350,95 @@
 
                 <form id="stockForm">
 
-
                     <div class="form-grid">
-
-
                         <div class="form-group">
-
-                            <label>
-                                Category
-                            </label>
-
-                            <select
-                                id="category"
-                                required
-                            >
-
-                                <option value="">
-                                    Select category
-                                </option>
-
-                                <option>
-                                    Tablet
-                                </option>
-
-                                <option>
-                                    Injection
-                                </option>
-
-                                <option>
-                                    Syrup
-                                </option>
-
-                                <option>
-                                    Drip
-                                </option>
-
-                                <option>
-                                    Equipment
-                                </option>
-
-                                <option>
-                                    Others
-                                </option>
-
+                            <label> Category </label>
+                            <select id="category" required >
+                                <option value=""> Select category </option>
+                                <option> Tablet </option>
+                                <option>   Injection </option>
+                                <option> Syrup </option>
+                                <option>  Drip </option>
+                                <option>  Equipment </option>
+                                <option>  Others </option>
                             </select>
-
                         </div>
 
-
                         <div class="form-group">
-
-                            <label>
-                                Medicine / Item Name
-                            </label>
-
-                            <input
-                                type="text"
-                                id="medicineName"
-                                placeholder="e.g. Paracetamol"
-                                required
-                            >
-
+                            <label> Medicine / Item Name </label>
+                            <input type="text"  id="medicineName" placeholder="e.g. Paracetamol"  required>
                         </div>
 
-
                         <div class="form-group">
-
-                            <label>
-                                Unit
-                            </label>
-
-                            <select
-                                id="stockUnit"
-                                required
-                            >
-
-                                <option value="">
-                                    Select unit
-                                </option>
-
-                                <option>
-                                    Pack/Card
-                                </option>
-
-                                <option>
-                                    Ampoules
-                                </option>
-
-                                <option>
-                                    Bottle
-                                </option>
-
-                                <option>
-                                    Vial
-                                </option>
-
-                                <option>
-                                    Box
-                                </option>
-
-                                <option>
-                                    Others
-                                </option>
-
+                            <label>   Unit  </label>
+                            <select  id="stockUnit" required >
+                                <option value=""> Select unit </option>
+                                <option> Pack/Card </option>
+                                <option>Ampoules </option>
+                                <option>Bottle </option>
+                                <option> Vial  </option>
+                                <option> Box </option>
+                                <option> Others </option>
                             </select>
-
                         </div>
-
 
                         <div class="form-group">
-
-                            <label>
-                                Quantity Added
-                            </label>
-
-                            <input
-                                type="number"
-                                id="quantity"
-                                min="1"
-                                placeholder="Enter quantity"
-                                required
-                            >
-
+                            <label> Quantity Added </label>
+                            <input type="number"  id="quantity"  min="1"  placeholder="Enter quantity" required >
                         </div>
-
 
                         <div class="form-group">
-
-                            <label>
-                                Expiry Date
-                            </label>
-
-                            <input
-                                type="date"
-                                id="expiryDate"
-                            >
-
+                            <label>  Expiry Date  </label>
+                            <input  type="date" id="expiryDate" >
                         </div>
-
 
                         <div class="form-group">
-
-                            <label>
-                                Supplier
-                            </label>
-
-                            <input
-                                type="text"
-                                id="supplier"
-                                placeholder="Supplier / Pharmacy"
-                            >
-
+                            <label> Supplier </label>
+                            <input  type="text"   id="supplier"  placeholder="Supplier / Pharmacy Bought from" >
                         </div>
 
+                        <div class="form-group">
+                             <label for="totalCost"> Total Purchase Cost (₦) </label>
+                             <input type="number" id="totalCost" min="0"  step="0.01"  placeholder="price in naira" required>
+                        </div>
                     </div>
 
 
                     <div class="form-actions">
-
-                        <button
-                            type="reset"
-                            class="btn-light"
-                        >
-                            Clear
-                        </button>
-
-                        <button
-                            type="submit"
-                            class="btn-primary"
-                        >
-                            Add Stock
-                        </button>
-
+                        <button  type="reset"  class="btn-light" > Clear </button>
+                        <button type="submit" class="btn-primary"> Add Stock </button>
                     </div>
 
                 </form>
+
+                <div id="stockPricePreview" class="price-preview">
+                 <h3>Cost Breakdown</h3>
+                  <div class="price-row">
+                    <span> Quantity </span>
+                    <strong id="previewQuantity"> 0  </strong>
+                  </div>
+
+                  <div class="price-row">
+                    <span> Total Purchase Cost </span>
+                    <strong id="previewTotalCost"> ₦0.00 </strong>
+                  </div>
+
+                  <div class="price-row">
+                    <span>  Cost Per Unit </span>
+                    <strong id="previewUnitCost">  ₦0.00 </strong>
+                  </div>
+
+                  <div class="price-row">
+                    <span>  Markup  </span>
+                    <strong> 500%  </strong>
+                  </div>
+
+                  <div class="price-row highlight">
+                    <span> Estimated Selling Price / Unit  </span>
+                    <strong id="previewSellingPrice">  ₦0.00  </strong>
+                  </div>
+                </div>
+
 
             </div>
 
@@ -611,127 +449,72 @@
              RECORD USAGE
         ======================================= -->
 
-        <section
-            id="record-usage"
-            class="page-section"
-        >
-
+        <section id="record-usage" class="page-section">
             <div class="section-heading">
-
-                <h2>
-                    Record Stock Usage
-                </h2>
-
-                <p>
-                    Record medicines or supplies issued to patients.
-                </p>
-
+                <!-- <h2> Record Stock Usage</h2>
+                <p>  Record medicines or supplies issued to patients. </p> -->
             </div>
 
-
             <div class="form-card">
-
                 <form id="usageForm">
-
-
                     <div class="form-grid">
-
-
                         <div class="form-group full">
-
-                            <label>
-                                Medicine / Item
-                            </label>
-
-                            <select
-                                id="medicine"
-                                required
-                            >
-
-                                <option value="">
-                                    Loading medicines...
-                                </option>
-
+                            <label>  Medicine / Item </label>
+                            <select id="medicine" required >
+                            <option value=""> Loading medicines... </option>
                             </select>
-
-                            <small
-                                id="availableStock"
-                                class="stock-hint"
-                            >
-                                Select an item to see available stock.
-                            </small>
-
+                            <small id="availableStock"  class="stock-hint">  Select an item to see available stock. </small>
                         </div>
-
 
                         <div class="form-group">
-
-                            <label>
-                                Quantity
-                            </label>
-
-                            <input
-                                type="number"
-                                id="usageQuantity"
-                                min="1"
-                                placeholder="Amount taken"
-                                required
-                            >
-
+                            <label> Quantity </label>
+                            <input  type="number" id="usageQuantity" min="1" placeholder="Amount taken" required >
                         </div>
-
 
                         <div class="form-group">
-
-                            <label>
-                                Patient Name
-                            </label>
-
-                            <input
-                                type="text"
-                                id="patientName"
-                                placeholder="e.g. Mr Caleb"
-                            >
-
+                            <label>  Patient Name </label>
+                            <input type="text" id="patientName" placeholder="e.g. Mr Caleb">
                         </div>
-
 
                         <div class="form-group full">
-
-                            <label>
-                                Description
-                            </label>
-
-                            <textarea
-                                id="description"
-                                placeholder="e.g. Taken for patient treatment"
-                            ></textarea>
-
+                            <label> Description  </label>
+                            <textarea  id="description"  placeholder="e.g. Taken for Sir Joy, a patient on treatment"></textarea>
                         </div>
-
                     </div>
-
 
                     <div class="form-actions">
-
-                        <button
-                            type="reset"
-                            class="btn-light"
-                        >
-                            Clear
-                        </button>
-
-                        <button
-                            type="submit"
-                            class="btn-danger"
-                        >
-                            Record Usage
-                        </button>
-
+                        <button type="reset" class="btn-light" > Clear </button>
+                        <button type="submit" class="btn-danger">  Record Usage </button>
                     </div>
-
                 </form>
 
+                 <div id="usagePricePreview" class="price-preview">
+                    <h3>Item Details</h3>
+                  <div class="price-row">
+                    <span> Available Stock </span>
+                    <strong id="usageAvailable"> - </strong>
+                  </div>
+
+                <div class="price-row">
+                    <span> Cost Per Unit </span>
+                    <strong id="usageUnitCost">  ₦0.00 </strong>
+                </div>
+
+                <div class="price-row">
+                    <span> Selling Price / Unit </span>
+                    <strong id="usageSellingPrice">  ₦0.00 </strong>
+                </div>
+
+                <div class="price-row">
+                    <span> Markup </span>
+                    <strong> 500% </strong>
+                </div>
+
+                <div class="price-row highlight">
+                    <span> Amount To Pay </span>
+                    <strong id="usageTotalAmount"> ₦0.00  </strong>
+                </div>
+             </div>
             </div>
 
         </section>
@@ -741,20 +524,10 @@
              VIEW RECORDS
         ======================================= -->
 
-        <section
-            id="view-records"
-            class="page-section"
-        >
-
+        <section  id="view-records" class="page-section admin-only" >
             <div class="section-heading">
-
-                <h2>
-                    All Records
-                </h2>
-
-                <p>
-                    Search, filter and manage inventory activity.
-                </p>
+                <!-- <h2> All Records </h2> -->
+                <p>  You can search, filter and manage inventory activity. </p>
 
             </div>
 
@@ -866,6 +639,7 @@
                                 <th>Type</th>
                                 <th>Unit</th>
                                 <th>Quantity</th>
+                                <th>Amount</th>
                                 <th>User</th>
                                 <th>Patient</th>
                                 <th>Description</th>
@@ -909,62 +683,28 @@
 
         </section>
 
+             <!-- STATISTICS -->
 
-        <!-- ======================================
-             STATISTICS
-        ======================================= -->
-
-        <section
-            id="statistics"
-            class="page-section"
-        >
-
+        <section  id="statistics"  class="page-section admin-only" >
             <div class="section-heading">
-
-                <h2>
-                    Statistics
-                </h2>
-
-                <p>
-                    Overview of your inventory status.
-                </p>
-
+                <!-- <h2>  Statistics  </h2> -->
+                <p> Here is the overview of your inventory status.  </p>
             </div>
 
 
             <div class="statistics-grid">
-
                 <div class="stat-box">
-
-                    <span>
-                        Total Products
-                    </span>
-
-                    <strong id="statProducts">
-                        0
-                    </strong>
-
+                    <span> Total Products  </span>
+                    <strong id="statProducts">   0  </strong>
                 </div>
-
-
                 <div class="stat-box">
-
-                    <span>
-                        Total Stock
-                    </span>
-
-                    <strong id="statStock">
-                        0
-                    </strong>
-
+                    <span>  Total Stock  </span>
+                    <strong id="statStock">   0 </strong>
                 </div>
-
-
                 <div class="stat-box">
                     <span>  Low Stock Items </span>
                     <strong id="statLowStock">   0  </strong>
                 </div>
-
                 <div class="stat-box">
                     <span>   Expiring Soon </span>
                     <strong id="statExpiring">  0 </strong>
@@ -975,7 +715,8 @@
 
         <!-- NOTIFICATIONS -->
         <section id="notifications" class="page-section" >
-            <div class="section-heading"> <h2> Notifications </h2>
+            <div class="section-heading">
+                 <!-- <h2> Notifications </h2> -->
                 <p>  Important inventory alerts. </p>
             </div>
             <div id="notificationList" class="notifications-container" ></div>
